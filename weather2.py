@@ -1,7 +1,7 @@
 import os
 import operator
 from dotenv import load_dotenv
-from langchain_core.messages import BaseMessage, FunctionMessage, HumanMessage
+from langchain_core.messages import BaseMessage, SystemMessage, HumanMessage
 from langchain_core.utils.function_calling import convert_to_openai_function
 from langchain_community.tools.openweathermap import OpenWeatherMapQueryRun
 from langchain_ollama import ChatOllama
@@ -52,7 +52,10 @@ workflow.set_entry_point("agent")
 
 app = workflow.compile()
 
-input = {"messages": [HumanMessage(content="What is the temperature in Las Vegas?")]}
+input = {"messages": [
+    SystemMessage(content="Your task is to provide only the city name based on the user query. Nothing more, just the city name mentioned. If there is no city mentioned, then skip the tools to get the weather."),
+    HumanMessage(content="What is the temperature in Las Vegas?"),
+]}
 
 for output in app.stream(input):
     # stream() yields dictionaries with output keyed by node name
