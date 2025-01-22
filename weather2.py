@@ -29,6 +29,11 @@ def function_1(state):
 
 tool_node = ToolNode(tools)
 
+def function_2(state):
+    messages = state['messages']
+    agent_response = messages[-1]
+    return {"messages": [agent_response.content]}
+
 def where_to_go(state):
     messages = state['messages']
     last_message = messages[-1]
@@ -43,8 +48,9 @@ workflow = StateGraph(AgentState)
 
 workflow.add_node("agent", function_1)
 workflow.add_node("tool", tool_node)
+workflow.add_node("responder", function_2)
 
-workflow.add_conditional_edges("agent", where_to_go, {"continue": "tool", "end": END})
+workflow.add_conditional_edges("agent", where_to_go, {"continue": "tool", "end": "responder"})
 
 workflow.add_edge("tool", "agent")
 
